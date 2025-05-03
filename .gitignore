@@ -90,3 +90,7 @@ yarn-error.log*
 
 # Temporary files
 *.swp
+
+# Custom ignores
+# Ignore the specific ServerConfig asset containing sensitive URLs
+Assets/Configuration/ServerConfig.asset # Adjust path if you saved it elsewhere
