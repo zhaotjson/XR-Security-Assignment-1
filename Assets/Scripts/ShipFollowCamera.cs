@@ -8,6 +8,11 @@ public class ShipFollowCamera : MonoBehaviour
     [SerializeField] private float verticalOffset = -0.5f;
     [SerializeField] private float smoothSpeed = 5f;
 
+    // Add a threshold to ignore small movements
+    [SerializeField] private float movementThreshold = 0.01f; // Minimum movement to trigger rotation
+    [SerializeField] private float rotationThreshold = 0.01f;  // Minimum rotation change to trigger updates
+
+
     private Transform arCameraTransform;
     private Vector3 previousPosition; // To store the ship's position in the previous frame
 
@@ -44,24 +49,31 @@ public class ShipFollowCamera : MonoBehaviour
         // Calculate movement direction
         Vector3 movementDirection = (transform.position - previousPosition).normalized;
 
-        // Align the ship's rotation with the camera's forward direction
-        Quaternion baseRotation = Quaternion.LookRotation(arCameraTransform.forward, Vector3.up) * Quaternion.Euler(0, 0, 90);
-        Quaternion targetRotation = baseRotation;
-
-        if (movementDirection != Vector3.zero)
+        // Check if movement exceeds the threshold
+        if ((transform.position - previousPosition).magnitude > movementThreshold)
         {
-            // Roll on the z-axis for left/right movement
-            float rollZ = -movementDirection.x * 30f;
+            // Align the ship's rotation with the camera's forward direction
+            Quaternion baseRotation = Quaternion.LookRotation(arCameraTransform.forward, Vector3.up) * Quaternion.Euler(0, 0, 90);
+            Quaternion targetRotation = baseRotation;
 
-            // Roll on the x-axis for up/down movement
-            float rollX = movementDirection.y * 30f;
+            if (movementDirection != Vector3.zero)
+            {
+                // Roll on the z-axis for left/right movement
+                float rollZ = -movementDirection.x * 30f;
 
-            // Combine the rolls with the base rotation
-            targetRotation *= Quaternion.Euler(rollX, 0, rollZ);
+                // Roll on the x-axis for up/down movement
+                float rollX = movementDirection.y * 30f;
+
+                // Combine the rolls with the base rotation
+                targetRotation *= Quaternion.Euler(rollX, 0, rollZ);
+            }
+
+            // Smoothly rotate towards the target rotation only if the change exceeds the threshold
+            if (Quaternion.Angle(transform.rotation, targetRotation) > rotationThreshold)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
+            }
         }
-
-        // Smoothly rotate towards the target rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
 
         // Update previous position
         previousPosition = transform.position;
