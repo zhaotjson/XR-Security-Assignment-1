@@ -61,10 +61,6 @@ node index.js
 - Uses [AstronomyAPI](https://astronomyapi.com/) to fetch a real-time star map image based on the player's GPS.
 - The image is mapped onto a hemisphere above the AR scene.
 
-## Voice Commands
-
-- **"shoot"** — Start firing lasers.
-- **"stop"** — Stop firing lasers.
 
 ## Notes
 
@@ -77,4 +73,13 @@ node index.js
 - AstronomyAPI for sky images.
 - Unity, AR Foundation, and platform-native speech APIs.
 - Node.js and Express for the high score backend.
+
+Extra Assets:
+https://pixabay.com/sound-effects/laser-45816/
+
+https://www.fontspace.com/pixelated-elegance-font-f126145
+
+https://tools.wwwtyro.net/space-3d/index.html#animationSpeed=1&fov=80&nebulae=true&pointStars=true&resolution=1024&seed=5hpkc8epc7k0&stars=true&sun=true
+
+
 
