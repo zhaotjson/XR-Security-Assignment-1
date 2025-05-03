@@ -9,7 +9,7 @@ public class HighScoreManager : MonoBehaviour
     [SerializeField] private GameObject highScoreCanvas; // Canvas to display high scores
     [SerializeField] private TextMeshProUGUI highScoreText; // Text element to display scores
     // !! IMPORTANT: Replace <Your-Computer-IP> with your actual local network IP address !!
-    private string highScoreAPIUrl = "http://172.23.254.130:3000/api/highscores"; // Manually set API URL
+    private string highScoreAPIUrl = "https://ca5b-131-179-134-4.ngrok-free.app/api/highscores"; // Manually set API URL
 
     private void Start()
     {

@@ -16,7 +16,7 @@ public class GameOverManager : MonoBehaviour
 
     private int finalScore; // Store the score locally
     // !! IMPORTANT: Replace <Your-Computer-IP> with your actual local network IP address !!
-    private string highScoreAPIUrl = "http://172.23.254.130:3000/api/highscores"; // Manually set API URL
+    private string highScoreAPIUrl = "https://ca5b-131-179-134-4.ngrok-free.app/api/highscores"; // Manually set API URL
 
     // Simple class for JSON serialization
     [System.Serializable]
