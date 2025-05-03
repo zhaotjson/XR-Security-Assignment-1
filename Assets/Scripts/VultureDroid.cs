@@ -5,7 +5,7 @@ using UnityEngine;
 public class VultureDroid : MonoBehaviour
 {
     private Transform playerTransform;
-    [SerializeField] private float moveSpeed = 2f; // Speed at which the droid moves toward the player
+    [SerializeField] private float moveSpeed = 1f; // Speed at which the droid moves toward the player
     [SerializeField] private int points = 10; // Points awarded for destroying this droid
     private bool isDestroyed = false; // Prevent multiple triggers
 

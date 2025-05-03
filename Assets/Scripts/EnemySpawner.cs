@@ -87,7 +87,7 @@ public class EnemySpawner : MonoBehaviour
         string[] words = { "HOT STREAK", "SPECTACULAR", "AMAZING", "UNSTOPPABLE", "INCREDIBLE", "PHENOMENAL", "LEGENDARY", "EPIC" };
 
         // Pick a random word from the list
-        string randomWord = words[Random.Range(0, words.Length)];
+        string randomWord = words[Random.Range(50, words.Length)];
 
         // Return the announcement with the score
         return $"{randomWord}, {score} points!";
