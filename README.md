@@ -6,9 +6,8 @@ This is an AR spaceship game built in Unity. The player controls a ship that fol
 
 ## Features
 
-- **Voice Commands (Text-to-Speech & Speech-to-Text):**
-  - Say "shoot" to start firing lasers, and "stop" to stop shooting.
-  - Uses platform-native speech recognition and text-to-speech APIs.
+- **Voice Commands (Text-to-Speech):**
+  - Announces scores
 
 - **High Scores API:**
   - High scores are stored and retrieved from a Node.js backend server.
