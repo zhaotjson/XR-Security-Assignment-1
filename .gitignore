@@ -73,3 +73,33 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+# AR-specific generated files
+/[Aa]ssets/[Aa]ugmented[Rr]eality/*
+
+# ARKit/ARCore plugin cache or temporary files
+/[Aa]ssets/Plugins/ARKit*
+/[Aa]ssets/Plugins/ARCore*
+
+# Auto-generated XR settings or configurations
+/[Pp]rojectSettings/XRSettings.asset
+/[Pp]rojectSettings/XRSettings.asset.meta
+
+# Auto-generated AR session data
+/[Aa]ssets/[Ss]treamingAssets/ARSession*
+
+# Temporary AR tracking data
+/[Tt]emp/ARTracking*
+
+# Device-specific AR build files
+*.ipa
+*.xcodeproj
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata
+
+# AR debugging or profiling data
+/[Dd]ebugLogs/
+*.trace
+*.profiler
