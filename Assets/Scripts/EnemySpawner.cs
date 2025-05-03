@@ -36,7 +36,7 @@ public class EnemySpawner : MonoBehaviour
         // Use text-to-speech to provide instructions
         if (textToSpeechManager != null)
         {
-            textToSpeechManager.Speak("Say shoot to start shooting, and stop to stop shooting.");
+            textToSpeechManager.Speak("Shoot down the spaceships before they reach you!");
         }
         else
         {
