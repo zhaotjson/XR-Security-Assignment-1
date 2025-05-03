@@ -15,7 +15,8 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private GameObject scoreSubmittedSection; // Object to show after submission (optional)
 
     private int finalScore; // Store the score locally
-    private string highScoreAPIUrl = "http://localhost:3000/api/highscores"; // Define the API URL here
+    // !! IMPORTANT: Replace <Your-Computer-IP> with your actual local network IP address !!
+    private string highScoreAPIUrl = "http://172.23.254.130:3000/api/highscores"; // Manually set API URL
 
     // Simple class for JSON serialization
     [System.Serializable]
@@ -27,6 +28,19 @@ public class GameOverManager : MonoBehaviour
 
     private void Start()
     {
+        // --- Validate URL ---
+        Debug.Log($"[GameOverManager] Using API URL: {highScoreAPIUrl}");
+        bool isUrlValid = !string.IsNullOrEmpty(highScoreAPIUrl) && !highScoreAPIUrl.Contains("<Your-Computer-IP>");
+
+        if (!isUrlValid)
+        {
+            Debug.LogError("[GameOverManager] API URL is invalid or still contains placeholder <Your-Computer-IP>. Please edit GameOverManager.cs and set the correct URL.");
+            // Disable submission if URL is invalid
+            if (submitButton != null) submitButton.interactable = false;
+            if (scoreInputSection != null) scoreInputSection.SetActive(false);
+        }
+        // --- End Validation ---
+
         // Retrieve the score from PlayerPrefs
         finalScore = PlayerPrefs.GetInt("FinalScore", 0);
 
@@ -43,14 +57,21 @@ public class GameOverManager : MonoBehaviour
         // Ensure Player Name Input is assigned
         if (playerNameInput == null)
         {
-             Debug.LogError("Player Name Input is not assigned in the Inspector.");
-             if (submitButton != null) submitButton.interactable = false;
+            Debug.LogError("Player Name Input is not assigned in the Inspector.");
+            if (submitButton != null) submitButton.interactable = false;
         }
-        else // Only set initial UI state if input field exists
+        // Enable UI only if URL and input are valid
+        else if (isUrlValid)
         {
-             if (scoreInputSection != null) scoreInputSection.SetActive(true);
-             if (scoreSubmittedSection != null) scoreSubmittedSection.SetActive(false);
-             if (submitButton != null) submitButton.interactable = true; // Enable button initially
+            if (scoreInputSection != null) scoreInputSection.SetActive(true);
+            if (scoreSubmittedSection != null) scoreSubmittedSection.SetActive(false);
+            if (submitButton != null) submitButton.interactable = true; // Enable button initially
+        }
+        else // Keep UI disabled otherwise
+        {
+            if (scoreInputSection != null) scoreInputSection.SetActive(false);
+            if (scoreSubmittedSection != null) scoreSubmittedSection.SetActive(false);
+            if (submitButton != null) submitButton.interactable = false;
         }
     }
 
@@ -62,53 +83,53 @@ public class GameOverManager : MonoBehaviour
             Debug.LogError("Cannot submit score. Check Player Name Input and Submit Button Inspector assignments.");
             return;
         }
+        // Add check for valid URL before submitting
+        if (string.IsNullOrEmpty(highScoreAPIUrl) || highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+             Debug.LogError("Cannot submit score. API URL is not configured correctly in GameOverManager.cs.");
+             return;
+        }
 
         string playerName = playerNameInput.text;
-
-        // Use a default name if the input is empty
         if (string.IsNullOrWhiteSpace(playerName))
         {
             playerName = "Player";
         }
 
-        // Submit the score directly using a coroutine
         Debug.Log($"Submitting score directly: {playerName} - {finalScore}");
         StartCoroutine(SubmitScoreDirectlyCoroutine(playerName, finalScore));
 
-        // Update UI: Disable input/button, show confirmation
         submitButton.interactable = false;
-        playerNameInput.interactable = false; // Make input field non-editable
-
-        if (scoreInputSection != null)
-        {
-            // Optionally hide the whole input section
-            // scoreInputSection.SetActive(false);
-        }
-        if (scoreSubmittedSection != null)
-        {
-            scoreSubmittedSection.SetActive(true); // Show "Score Submitted!" message
-        }
+        playerNameInput.interactable = false;
+        if (scoreInputSection != null) { /* ... */ }
+        if (scoreSubmittedSection != null) { scoreSubmittedSection.SetActive(true); }
     }
 
-    // New Coroutine to handle the web request directly
+    // Coroutine to handle the web request directly
     private IEnumerator SubmitScoreDirectlyCoroutine(string playerName, int score)
     {
+        // Ensure URL is valid before proceeding
+        if (string.IsNullOrEmpty(highScoreAPIUrl) || highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+            Debug.LogError("[SubmitScoreDirectly] Invalid API URL. Cannot send request.");
+            yield break; // Stop the coroutine
+        }
+
+        string fullApiUrl = highScoreAPIUrl;
+
         HighScoreEntry newScore = new HighScoreEntry { playerName = playerName, score = score };
         string json = JsonUtility.ToJson(newScore);
 
-        Debug.Log($"[SubmitScoreDirectly] Attempting to POST to: {highScoreAPIUrl}");
+        Debug.Log($"[SubmitScoreDirectly] Attempting to POST to: {fullApiUrl}");
         Debug.Log($"[SubmitScoreDirectly] JSON Payload: {json}");
 
-        // Using UnityWebRequest for POST
-        using (UnityWebRequest request = new UnityWebRequest(highScoreAPIUrl, "POST"))
+        using (UnityWebRequest request = new UnityWebRequest(fullApiUrl, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
-
-            // Optional: Add timeout
-            request.timeout = 10; // Timeout after 10 seconds
+            request.timeout = 10;
 
             yield return request.SendWebRequest();
 
@@ -117,7 +138,6 @@ public class GameOverManager : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 Debug.Log($"[SubmitScoreDirectly] Success! Response Code: {request.responseCode}");
-                // Optionally process response: Debug.Log(request.downloadHandler.text);
             }
             else
             {
@@ -127,24 +147,17 @@ public class GameOverManager : MonoBehaviour
                 {
                     Debug.LogError($"[SubmitScoreDirectly] Response Body (Error): {request.downloadHandler.text}");
                 }
-                // Optional: Re-enable button or show error message to user here
-                // submitButton.interactable = true;
-                // playerNameInput.interactable = true;
-                // if (scoreSubmittedSection != null) scoreSubmittedSection.SetActive(false);
-                // // Add a specific error message display?
             }
-        } // The 'using' statement ensures request.Dispose() is called.
+        }
     }
 
     public void RestartGame()
     {
-        // Load the main game scene
         SceneManager.LoadScene("Intro");
     }
 
     public void QuitGame()
     {
-        // Quit the application
         Application.Quit();
     }
 }
