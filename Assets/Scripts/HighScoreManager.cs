@@ -8,12 +8,20 @@ public class HighScoreManager : MonoBehaviour
 {
     [SerializeField] private GameObject highScoreCanvas; // Canvas to display high scores
     [SerializeField] private TextMeshProUGUI highScoreText; // Text element to display scores
-    private string highScoreAPIUrl = "http://localhost:3000/api/highscores"; // Verify this URL
+    // !! IMPORTANT: Replace <Your-Computer-IP> with your actual local network IP address !!
+    private string highScoreAPIUrl = "http://172.23.254.130:3000/api/highscores"; // Manually set API URL
 
     private void Start()
     {
         // Log the URL being used at runtime
         Debug.Log($"[HighScoreManager] Initialized. API URL: {highScoreAPIUrl}");
+        // Add validation for the URL placeholder
+        if (highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+            Debug.LogError("[HighScoreManager] API URL still contains placeholder <Your-Computer-IP>. Please edit HighScoreManager.cs and replace it with your computer's actual local IP address.");
+            // Optionally disable functionality if URL is invalid
+            // For example, prevent showing the high score screen if URL is bad
+        }
 
         // Ensure the high score canvas is hidden initially
         if (highScoreCanvas != null)
@@ -24,6 +32,16 @@ public class HighScoreManager : MonoBehaviour
 
     public void ShowHighScores()
     {
+        // Add check before attempting to fetch
+        if (string.IsNullOrEmpty(highScoreAPIUrl) || highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+            Debug.LogError("[HighScoreManager] Cannot show high scores. API URL is not configured correctly.");
+            if (highScoreText != null) highScoreText.text = "Error: Server URL not configured.";
+            // Ensure canvas is shown to display the error, or handle differently
+            if (highScoreCanvas != null) highScoreCanvas.SetActive(true);
+            return;
+        }
+
         // Show the high score canvas
         if (highScoreCanvas != null)
         {
@@ -48,6 +66,14 @@ public class HighScoreManager : MonoBehaviour
 
     public IEnumerator FetchHighScores(System.Action<List<HighScoreEntry>> callback)
     {
+        // Add check before attempting request
+        if (string.IsNullOrEmpty(highScoreAPIUrl) || highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+            Debug.LogError("[FetchHighScores] Invalid API URL. Cannot send request.");
+            if (highScoreText != null) highScoreText.text = "Error: Server URL not configured.";
+            yield break; // Stop the coroutine
+        }
+
         Debug.Log($"[FetchHighScores] Attempting to fetch from: {highScoreAPIUrl}");
         UnityWebRequest request = UnityWebRequest.Get(highScoreAPIUrl);
 
@@ -103,6 +129,13 @@ public class HighScoreManager : MonoBehaviour
 
     private IEnumerator SubmitHighScoreCoroutine(string playerName, int score)
     {
+        // Add check before attempting request
+        if (string.IsNullOrEmpty(highScoreAPIUrl) || highScoreAPIUrl.Contains("<Your-Computer-IP>"))
+        {
+            Debug.LogError("[SubmitHighScoreCoroutine] Invalid API URL. Cannot send request.");
+            yield break; // Stop the coroutine
+        }
+
         HighScoreEntry newScore = new HighScoreEntry { playerName = playerName, score = score };
         string json = JsonUtility.ToJson(newScore);
 
