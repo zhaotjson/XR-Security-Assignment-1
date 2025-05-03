@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VultureDroid : MonoBehaviour
 {
@@ -68,9 +69,25 @@ public class VultureDroid : MonoBehaviour
         {
             isDestroyed = true; // Mark as destroyed to prevent further triggers
 
-            // Destroy the player if the droid reaches them
+            // Trigger Game Over
+            GameOver();
+
+            // Destroy the player
             Destroy(other.gameObject);
             Debug.Log("Player destroyed by VultureDroid.");
         }
+    }
+
+    private void GameOver()
+    {
+        // Save the score to PlayerPrefs
+        EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
+        if (spawner != null)
+        {
+            PlayerPrefs.SetInt("FinalScore", spawner.GetScore());
+        }
+
+        // Load the Game Over scene
+        SceneManager.LoadScene("GameOver");
     }
 }

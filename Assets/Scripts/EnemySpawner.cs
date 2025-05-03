@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -25,6 +26,27 @@ public class EnemySpawner : MonoBehaviour
         }
 
         currentSpawnInterval = initialSpawnInterval;
+
+        // Start the grace period
+        StartCoroutine(GracePeriod());
+    }
+
+    private IEnumerator GracePeriod()
+    {
+        // Use text-to-speech to provide instructions
+        if (textToSpeechManager != null)
+        {
+            textToSpeechManager.Speak("Say shoot to start shooting, and stop to stop shooting.");
+        }
+        else
+        {
+            Debug.LogWarning("TextToSpeechManager is not assigned.");
+        }
+
+        // Wait for 3 seconds before starting enemy spawns
+        yield return new WaitForSeconds(3f);
+
+        // Start spawning enemies
         StartCoroutine(SpawnEnemies());
     }
 
@@ -74,7 +96,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         // Announce milestones every 50 points
-        if (score % 10 == 0 && textToSpeechManager != null)
+        if (score % 50 == 0 && textToSpeechManager != null)
         {
             string announcement = GetAnnouncementForScore(score);
             textToSpeechManager.Speak(announcement);
@@ -83,13 +105,22 @@ public class EnemySpawner : MonoBehaviour
 
     private string GetAnnouncementForScore(int score)
     {
-        // List of random words for announcements
         string[] words = { "HOT STREAK", "SPECTACULAR", "AMAZING", "UNSTOPPABLE", "INCREDIBLE", "PHENOMENAL", "LEGENDARY", "EPIC" };
-
-        // Ensure the random index is within bounds
         int randomIndex = Random.Range(0, words.Length);
-
-        // Return the announcement with the score
         return $"{words[randomIndex]}, {score} points!";
+    }
+
+    public void GameOver()
+    {
+        // Save the score to PlayerPrefs
+        PlayerPrefs.SetInt("FinalScore", score);
+
+        // Load the Game Over scene
+        SceneManager.LoadScene("GameOver");
+    }
+
+    public int GetScore()
+    {
+        return score;
     }
 }
